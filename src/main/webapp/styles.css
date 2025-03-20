@@ -1,11 +1,10 @@
-/* 🔥 Reset Styles */
+
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
 
-/* 🌟 General Body Styling */
 body {
     font-family: Arial, sans-serif;
     line-height: 1.6;
@@ -15,7 +14,6 @@ body {
     min-height: 100vh;
 }
 
-/* 📦 Container */
 .container {
     max-width: 1000px;
     margin: 0 auto;
@@ -30,7 +28,6 @@ body {
     box-shadow: 0 15px 25px rgba(0, 0, 0, 0.2);
 }
 
-/* 🌟 Headings */
 h1, h2, h3 {
     text-align: center;
     color: #444;
@@ -45,7 +42,6 @@ h2 {
     font-size: 28px;
 }
 
-/* ✅ Form Styling */
 form {
     background: white;
     padding: 25px;
@@ -63,7 +59,6 @@ form:hover {
     margin-bottom: 20px;
 }
 
-/* 🌟 Input Fields */
 input {
     width: 100%;
     padding: 12px;
@@ -79,7 +74,6 @@ input:focus {
     box-shadow: 0 0 8px rgba(76, 175, 80, 0.5);
 }
 
-/* 🟢 Buttons */
 button {
     background: #4CAF50;
     color: white;
@@ -101,7 +95,6 @@ button:active {
     transform: scale(0.95);
 }
 
-/* 🎯 Password List Styling */
 #passwordList {
     margin-top: 30px;
 }
@@ -147,7 +140,6 @@ button:active {
     background: #1976D2;
 }
 
-/* ✅ Modal Styles */
 .modal {
     display: none;
     position: fixed;
@@ -162,7 +154,6 @@ button:active {
     transition: opacity 0.3s, visibility 0.3s;
 }
 
-/* 🔥 Show Modal */
 .modal.show {
     display: flex;
     justify-content: center;
@@ -171,7 +162,6 @@ button:active {
     visibility: visible;
 }
 
-/* 🔥 Modal Content */
 .modal-content {
     background: white;
     padding: 40px;
@@ -183,21 +173,18 @@ button:active {
     animation: fadeIn 0.4s;
 }
 
-/* 🌟 Modal Heading */
 .modal-content h2 {
     font-size: 26px;
     margin-bottom: 20px;
     color: #444;
 }
 
-/* 🎯 Modal Form Inputs */
 .modal-content input {
     margin-bottom: 15px;
     padding: 12px;
     font-size: 16px;
 }
 
-/* 🔥 Switch Links in Modal */
 .modal-content a {
     color: #2196F3;
     text-decoration: none;
@@ -208,7 +195,6 @@ button:active {
     color: #1976D2;
 }
 
-/* ✅ Animations */
 @keyframes fadeIn {
     0% {
         transform: scale(0.9);
@@ -220,7 +206,6 @@ button:active {
     }
 }
 
-/* ✅ Responsive Design */
 @media screen and (max-width: 768px) {
     .container {
         padding: 20px;

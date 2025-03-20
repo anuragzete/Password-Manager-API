@@ -8,7 +8,6 @@
 </head>
 <body>
 
-<!-- Sign In / Sign Up Modal -->
 <div id="authModal" class="modal show">
     <div class="modal-content">
         <h2>Welcome to Password Manager</h2>
@@ -35,7 +34,6 @@
 <div class="container" style="display:none;" id="mainContent">
     <h1>Simple Password Manager</h1>
 
-    <!-- Add Password Form -->
     <form id="addPasswordForm">
         <h2>Add New Password</h2>
         <div class="form-group">
@@ -47,11 +45,13 @@
         <button type="submit">Save Password</button>
     </form>
 
-    <!-- Password List -->
     <div id="passwordList"></div>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.2.0/crypto-js.min.js"></script>
-<script src="script.js"></script>
+<script src="./main.js" type="module"></script>
+<script src="./auth.js" type="module"></script>
+<script src="./crypt.js" type="module"></script>
+<script src="./crud.js" type="module"></script>
 </body>
 </html>

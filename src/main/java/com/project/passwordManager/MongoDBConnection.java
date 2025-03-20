@@ -3,7 +3,6 @@ package com.project.passwordManager;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoDatabase;
-import jakarta.servlet.ServletException;
 
 import java.io.InputStream;
 import java.util.Properties;
@@ -16,35 +15,23 @@ public class MongoDBConnection {
 
     static {
         try (InputStream input = MongoDBConnection.class.getClassLoader().getResourceAsStream("config.properties")) {
-            if (input != null) {
-                if (input != null) {
-                    props.load(input);
-                    System.out.println("✅ MONGO_URI: " + props.getProperty("MONGO_URI"));
-                    System.out.println("✅ DB_NAME: " + props.getProperty("DB_NAME"));
-
-                    String mongoUri = props.getProperty("MONGO_URI");
-                    String dbName = props.getProperty("DB_NAME");
-
-                    mongoClient = MongoClients.create(mongoUri);
-
-                    if (mongoClient == null) {
-                        throw new ServletException("❌ Failed to connect to MongoDB client.");
-                    }
-
-                    database = mongoClient.getDatabase(dbName);
-
-                    if (database == null) {
-                        throw new ServletException("❌ Failed to connect to MongoDB database: " + dbName);
-                    }
-
-                    System.out.println("✅ Connected to database: " + dbName);
-
-                } else {
-                    throw new ServletException("❌ config.properties not found");
-                }
-            } else {
-                System.err.println("❌ config.properties not found.");
+            if (input == null) {
+                throw new RuntimeException("config.properties not found in classpath.");
             }
+
+            props.load(input);
+
+            String mongoUri = props.getProperty("MONGO_URI");
+            String dbName = props.getProperty("DB_NAME");
+
+            if (mongoUri == null || dbName == null) {
+                throw new RuntimeException("MONGO_URI or DB_NAME is missing in config.properties.");
+            }
+
+            mongoClient = MongoClients.create(mongoUri);
+            database = mongoClient.getDatabase(dbName);
+
+            System.out.println("✅ Connected to MongoDB: " + dbName);
         } catch (Exception e) {
             e.printStackTrace();
             throw new RuntimeException("Failed to initialize MongoDB connection: " + e.getMessage());
@@ -52,13 +39,19 @@ public class MongoDBConnection {
     }
 
     public static MongoDatabase getDatabase() {
+        if (database == null) {
+            throw new IllegalStateException("MongoDB database is not initialized.");
+        }
         return database;
     }
 
-    public static void close() {
+    public static synchronized void close() {
         if (mongoClient != null) {
             mongoClient.close();
+            mongoClient = null;
+            database = null;
             System.out.println("🛑 MongoDB connection closed.");
         }
     }
 }
+
