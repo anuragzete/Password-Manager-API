@@ -15,6 +15,11 @@ import org.json.JSONTokener;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
+
+import java.util.Date;
+
 @WebServlet("/auth")
 public class AuthServlet extends HttpServlet {
 
@@ -109,11 +114,16 @@ public class AuthServlet extends HttpServlet {
                 .projection(Projections.include("_id", "password"))
                 .first();
 
+
         if (userDoc != null && password.equals(userDoc.getString("password"))) {
+            int counter = userDoc.getInteger("passwordCounter", 0);
+            String token = JWTUtil.generateToken(userDoc.getObjectId("_id").toString(), counter);
+
             response.setStatus(HttpServletResponse.SC_OK);
             response.getWriter().write(new JSONObject()
                     .put("status", "success")
                     .put("userId", userDoc.getObjectId("_id").toString())
+                    .put("token", token)
                     .toString());
         } else {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
@@ -124,5 +134,29 @@ public class AuthServlet extends HttpServlet {
     @Override
     public void destroy() {
         System.out.println("AuthServlet destroyed.");
+    }
+
+    private class JWTUtil {
+        private static final String SECRET_KEY = "mySuperSecretKey";  // Change this to a secure key
+
+        // 🔥 Generate JWT with counter and expiry
+        public static String generateToken(String userId, int counter) {
+            return Jwts.builder()
+                    .setSubject(userId)
+                    .claim("counter", counter)  // Store counter in JWT payload
+                    .setIssuedAt(new Date())
+                    .setExpiration(new Date(System.currentTimeMillis() + 5 * 60 * 1000))  // 5-minute expiry
+                    .signWith(SignatureAlgorithm.HS256, SECRET_KEY)
+                    .compact();
+        }
+
+        // 🔥 Verify and extract counter from JWT
+        public static int verifyToken(String token) throws Exception {
+            return Jwts.parser()
+                    .setSigningKey(SECRET_KEY)
+                    .parseClaimsJws(token)
+                    .getBody()
+                    .get("counter", Integer.class);
+        }
     }
 }

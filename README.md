@@ -1,106 +1,125 @@
-# 🚀 Multi-threaded Download Manager
+# 🔐 Password Manager API
 
-A multi-threaded download manager built with Java Swing. It allows downloading multiple files simultaneously, displaying individual and overall progress with download speed.
+**A robust and secure RESTful API** designed to manage password data with **AES encryption**, **synchronization mechanisms**, and support for **both hard and soft sync** strategies.
 
 ---
 
-## 📁 Directory Structure
+## 🚀 Features
+
+### 🔥 **Authentication & Security**
+- **JWT-based authentication** for secure access.
+- AES-encrypted password storage.
+- **Master password** validation to unlock encrypted data.
+
+### 🔄 **Synchronization Mechanism**
+- **Soft Sync:**
+    - Only merges missing or new records.
+    - Ensures faster, conflict-free synchronization.
+- **Hard Sync:**
+    - Performs a full data overwrite.
+    - Ensures consistency with the backend.
+
+### 🌐 **RESTful Endpoints**
+- **/auth** → Authentication and token management.
+- **/crud** → Create, read, update, and delete encrypted passwords.
+- **/sync** → Sync local and remote data seamlessly.
+
+### 💾 **Data Storage & Encryption**
+- Stores encrypted passwords in a **MongoDB database**.
+- AES-256 encryption ensures data privacy.
+
+---
+
+## 🛠️ Tech Stack
+
+- **Java (Backend)**: Core API implementation.
+- **MongoDB**: Database for storing encrypted data.
+- **AES-256 Encryption**: Secures stored passwords.
+- **JWT Authentication**: For secure API access.
+
+---
+
+## 📊 REST API Endpoints
+
+### 🔑 **Authentication**
+- `POST /auth/login`: Authenticate with master password → Returns JWT token.
+- `POST /auth/logout`: Invalidate JWT token.
+
+### 🔥 **CRUD Operations**
+- `POST /crud`: Create new encrypted password.
+- `GET /crud`: Fetch all encrypted passwords.
+- `PUT /crud/{id}`: Update existing password by ID.
+- `DELETE /crud/{id}`: Delete password by ID.
+
+### 🔄 **Sync Operations**
+- `POST /sync/soft`: Perform soft sync.
+- `POST /sync/hard`: Perform hard sync.
+
+---
+
+## 💻 How to Run Locally
+
+### ✅ **Prerequisites:**
+- **JDK 21** installed.
+- **Apache Tomcat** server.
+- **MongoDB credentials** configured in `config.properties` at the root directory:
 ```
-Download_Manager/
-├── src/
-│   ├── main/
-│   │   ├── java/
-│   │   │   └── com/
-│   │   │       └── multithreaded/
-│   │   │           ├── downloader/          # Core download logic
-│   │   │           └── downloaderUI/        # Java Swing UI components
-│   │   ├── resources/
-│   │   │   └── icons/                       # Icon assets
-├── pom.xml                                  # Maven configuration file (if used)
-├── build.gradle                             # Gradle configuration file (if used)
-├── LICENSE                                  # License file
-├── README.md                                # Project documentation
+MONGO_URI=<your-mongodb-uri>
+DB_NAME=<your-database-name>
+COLLECTION_NAME=<your-collection-name>
 ```
 
----
-
-## ⚙️ Features
-- Multi-threaded downloads with concurrent execution.
-- Real-time progress bars and download speed display.
-- Console log for download status.
-- Cancel and stop all downloads functionality.
-- Easy-to-use Java Swing GUI.
-
----
-
-## 🛠️ Installation
-### Clone the repository
+### 🚀 **Steps:**
+1. Clone the repository:
 ```bash
-git clone https://github.com/anuragzete/Download-Manager.git
-cd Download_Manager
+$ git clone https://github.com/anuragzete/Password-Manager-API.git
 ```
-
-### Compile and Run
-If using Maven:
+2. Install dependencies:
 ```bash
-mvn clean install
-java -cp target/Download_Manager-1.0.jar com.multithreaded.downloaderUI.Main
+$ mvn clean install
 ```
-If using Gradle:
-```bash
-gradle build
-java -cp build/libs/Download_Manager-1.0.jar com.multithreaded.downloaderUI.Main
+3. Deploy the WAR file to Tomcat:
+- Copy the WAR file from `target/` to `TOMCAT_HOME/webapps/`
+- Start Tomcat server.
+4. Access the API at:
+```
+http://localhost:8080
 ```
 
 ---
 
-## 🖥️ Usage
-1. **Paste URLs:** Enter multiple URLs separated by newlines in the input area.
-2. **Start All:** Begins downloading all the URLs concurrently.
-3. **Stop All:** Pauses all ongoing downloads.
-4. **Cancel All:** Stops and removes all downloads.
-5. **Console:** Displays logs with download status, errors, and completion messages.
+## 📚 Folder Structure
+
+```plaintext
+/password-manager-api
+ ├── src
+ │     ├── com/password/api            # Core API logic
+ │     │     ├── AuthServlet                  # Authentication handlers
+ │     │     ├── CRUDServlet                  # CRUD operations
+ │     │     ├── SyncServlet                  # Sync logic
+ │     │     ├── MongoDBConnection            # MongoDB connection utility class
+ │     └── resources                   # Configuration and assets
+ ├── config.properties                 # MongoDB credentials
+ ├── README.md
+ ├── LICENSE
+ ├── docs                              # Javadoc documentation
+ ├── target                            # Build artifacts
+```
 
 ---
 
-## 🛠️ Technologies Used
-- Java (Swing for GUI)
-- Multi-threading
-- Maven or Gradle for build management
+## ⚖️ License
 
----
-
-## 📝 Future Enhancements
-- ✅ **Pause/Resume for individual downloads**
-- ✅ **More advanced download management** (retry failed downloads, auto-resume on app restart)
-- ✅ **Dark mode UI** 🌙
-- ✅ **Database integration for tracking download history**
-- ✅ **Custom file destination selection** 📂
-
----
-
-## ✨ Screenshots
-📸 **Main Download Panel**
-![Main UI](./screenshots/main_ui.png)
-
-📸 **Progress Panel**
-![Progress UI](./screenshots/progress_ui.png)
-
----
-
-## 📌 Contributions
-Contributions are welcome! Feel free to fork the project, submit issues, or create pull requests.
-
----
-
-## 📜 License
-This project is licensed under the [MIT License](LICENSE).
+This project is licensed under the **MIT License**. Feel free to use, modify, and distribute it.
 
 ---
 
 ## 📧 Contact
-For any issues or inquiries, contact me at: [anuragzete27@outlook.com](mailto:anuragzete27@outlook.com)
+
+- **Email:** anuragzete27@outlook.com
+- **Portfolio:** [Anurag Zete](https://portfolio-anuragzete.web.app)
 
 ---
 
-## ✅ Happy downloading! 🚀
+🔐 **Efficient and secure password management through a powerful API!** 🎉
+

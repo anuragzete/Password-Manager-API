@@ -3,7 +3,6 @@ package com.project.passwordManager;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Projections;
-import com.mongodb.client.model.UpdateOptions;
 import com.mongodb.client.model.Updates;
 import com.mongodb.client.result.UpdateResult;
 import jakarta.servlet.ServletException;
@@ -19,10 +18,11 @@ import org.json.JSONObject;
 import org.bson.types.ObjectId;
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.time.Instant;
 import java.util.List;
 
-@WebServlet("/passwords")
-public class PasswordManagerServlet extends HttpServlet {
+@WebServlet("/crud")
+public class CRUDServlet extends HttpServlet {
 
     private MongoCollection<Document> userCollection;
 
@@ -60,8 +60,10 @@ public class PasswordManagerServlet extends HttpServlet {
             String userId = jsonObject.optString("user_id", "").trim();
             String siteName = jsonObject.optString("site_name", "").trim();
             String password = jsonObject.optString("password", "").trim();
+            String action = jsonObject.optString("action", "").trim();   // "add" or "delete"
+            long frontendCounter = jsonObject.optLong("counter", -1);
 
-            if (userId.isEmpty() || siteName.isEmpty() || password.isEmpty()) {
+            if (userId.isEmpty() || siteName.isEmpty() || action.isEmpty()) {
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                 response.getWriter().write(new JSONObject().put("error", "Missing parameters").toString());
                 return;
@@ -75,20 +77,61 @@ public class PasswordManagerServlet extends HttpServlet {
 
             Bson filter = Filters.eq("_id", new ObjectId(userId));
 
-            Bson updateExisting = Updates.set("passwords.$[elem].password", password);
-            UpdateOptions options = new UpdateOptions().arrayFilters(List.of(Filters.eq("elem.site", siteName)));
+            Document userDoc = userCollection.find(filter).first();
+            if (userDoc == null) {
+                response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                response.getWriter().write(new JSONObject().put("error", "User not found").toString());
+                return;
+            }
 
-            UpdateResult result = userCollection.updateOne(filter, updateExisting, options);
+            long backendCounter = userDoc.getLong("passwordCounter");
 
-            if (result.getMatchedCount() == 0) {
-                Document newPassword = new Document("site", siteName).append("password", password);
-                Bson addNewPassword = Updates.push("passwords", newPassword);
+            if (frontendCounter != backendCounter) {
+                response.setStatus(HttpServletResponse.SC_CONFLICT);
+                response.getWriter().write(new JSONObject()
+                        .put("error", "Counter mismatch, please sync again")
+                        .toString());
+                return;
+            }
 
-                userCollection.updateOne(filter, addNewPassword, new UpdateOptions().upsert(true));
+            boolean modified = false;
 
-                response.getWriter().write(new JSONObject().put("status", "New password added").toString());
+            if (action.equalsIgnoreCase("add")) {
+                Document newPassword = new Document("site", siteName)
+                        .append("password", password)
+                        .append("lastModified", Instant.now().toString());
+
+                Bson addPassword = Updates.push("passwords", newPassword);
+                userCollection.updateOne(filter, addPassword);
+
+                modified = true;
+
+                response.getWriter().write(new JSONObject().put("status", "Password added").toString());
+
+            } else if (action.equalsIgnoreCase("delete")) {
+                // ✅ Delete password
+                Bson deletePassword = Updates.pull("passwords", Filters.eq("site", siteName));
+
+                UpdateResult result = userCollection.updateOne(filter, deletePassword);
+
+                if (result.getModifiedCount() > 0) {
+                    modified = true;
+                    response.getWriter().write(new JSONObject().put("status", "Password deleted").toString());
+                } else {
+                    response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                    response.getWriter().write(new JSONObject().put("error", "Password not found").toString());
+                }
+
             } else {
-                response.getWriter().write(new JSONObject().put("status", "Password updated").toString());
+                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                response.getWriter().write(new JSONObject().put("error", "Invalid action").toString());
+                return;
+            }
+
+            // ✅ Increment the counter only if a modification occurred
+            if (modified) {
+                Bson incrementCounter = Updates.inc("passwordCounter", 1);
+                userCollection.updateOne(filter, incrementCounter);
             }
 
         } catch (Exception e) {
@@ -97,6 +140,7 @@ public class PasswordManagerServlet extends HttpServlet {
             response.getWriter().write(new JSONObject().put("error", e.getMessage()).toString());
         }
     }
+
 
 
     @Override
